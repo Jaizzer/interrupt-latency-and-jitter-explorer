@@ -1,6 +1,11 @@
 #include "stm32f411xe.h"
 
 int main(void) {
+    // Enable CPU timer monitoring
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    DWT->CYCCNT = 0;
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+
     RCC->AHB1ENR |= RCC_APB1ENR_TIM2EN;
     TIM2->PSC |= 15;
     TIM2->ARR |= 999;
