@@ -3,11 +3,18 @@ MEMORY
     FLASH (rx): ORIGIN = 0x08000000, LENGTH = 512K
     RAM (rwx): ORIGIN = 0x20000000, LENGTH = 128K
 }
-__reset_stack_pointer = ORIGIN(RAM) + LENGTH(RAM);
+__estack = ORIGIN(RAM) + LENGTH(RAM);
 
 
 SECTIONS
 {
+    .isr_vector:
+    {
+        . = ALIGN(4);
+        KEEP(*(.isr_vector))
+        . = ALIGN(4);
+    } > FLASH   
+
     .text : {
         /* Set the initial address to 0 */
         . = 0;
