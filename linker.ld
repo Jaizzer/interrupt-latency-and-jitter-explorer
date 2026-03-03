@@ -1,13 +1,20 @@
+
+/* --- 1. Memory Definitions --- */
+/* Defines the physical boundaries of the STM3F411 chip */
 MEMORY 
 {
     FLASH (rx): ORIGIN = 0x08000000, LENGTH = 512K
     RAM (rwx): ORIGIN = 0x20000000, LENGTH = 128K
 }
+
+/* Define the end of RAM to use as the Initial Stack pointer since the stack grows downward */
 __estack = ORIGIN(RAM) + LENGTH(RAM);
 
 
+/*  ---2. Sections Mapping ---- */
 SECTIONS
-{
+{   
+    /* The Vector Table: Must be at the very start of Flash (0x08000000) */
     .isr_vector:
     {
         . = ALIGN(4);
