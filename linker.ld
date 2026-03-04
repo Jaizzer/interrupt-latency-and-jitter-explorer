@@ -26,27 +26,27 @@ SECTIONS
     .isr_vector :
     {
         /* * 1. . = ALIGN(4);
-         * The ARM CPU is 32-bit. It cannot read the vector table if it starts 
-         * on an odd address. This forces the table to start on a 4-byte boundary.
+         * The "Snap to Grid" rule. ARM CPUs are 32-bit and grab data in 4-byte 
+         * chunks. If the current address is 0x08000002, this command adds 
+         * 2 bytes of padding to push it to 0x08000004. If it's at 0x08000003, 
+         * it adds 1 byte. This ensures the table starts on a clean 'lane'.
          */
         . = ALIGN(4);
 
         /* * 2. KEEP(*(.isr_vector))
-         * THE PROTECTOR: Because no C function (like main) ever calls the 
-         * vector table, the Linker thinks it is "unused code" and will try 
-         * to delete it to save space. KEEP tells the linker: "This is for 
-         * the hardware, not the software. Do NOT delete it!"
-         * * The * means "look in all files" (including your ASSEMBLY file), 
-         * and (.isr_vector) is the section label inside that assembly file.
+         * THE PROTECTOR: Tells the Linker NOT to delete this section. 
+         * Since the hardware uses this table (not the software), the 
+         * linker's garbage collector would otherwise throw it away.
          */
         KEEP(*(.isr_vector))
 
         /* * 3. . = ALIGN(4);
-         * Ensures that whatever comes after the table (your code) also starts 
-         * on a clean 32-bit boundary for maximum speed.
+         * The "Exit Alignment". Ensures that whatever follows this table 
+         * (your code) also starts on a multiple of 4. This prevents 
+         * 'misaligned access' which can slow down the CPU or cause crashes 
+         * when jumping to your functions.
          */
         . = ALIGN(4);
-
     } > FLASH   /* This "> FLASH" tells the linker to put this block at 0x08000000 */
     
     .text : {
