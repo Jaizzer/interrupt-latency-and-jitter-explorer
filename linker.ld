@@ -49,14 +49,31 @@ SECTIONS
         . = ALIGN(4);
     } > FLASH   /* This "> FLASH" tells the linker to put this block at 0x08000000 */
     
-    .text : {
-        /* Set the initial address to 0 */
-        . = 0;
-        LONG(__reset_stack_pointer);
-        LONG(main | 1);
-        /* The whole interrupt table is 332 bytes long. Advance to that position. */
-        . = 332;
-        /* And here comes the rest of the code */
+    .text {
+         /* * 1. . = ALIGN(4);
+         * The "Snap to Grid" rule. ARM CPUs are 32-bit and grab data in 4-byte 
+         * chunks. If the current address is 0x08000002, this command adds 
+         * 2 bytes of padding to push it to 0x08000004. If it's at 0x08000003, 
+         * it adds 1 byte. This ensures the table starts on a clean 'lane'.
+         */
+        . = ALIGN(4);
+
+        /* 2. *(.text): The "Standard Bucket"
+         * Grabs the default code blocks from every object file. This is 
+         * where code goes if it was compiled WITHOUT '-ffunction-sections', 
+         * which is common for pre-compiled Standard Libraries (libc.a).
+         */
+        *(.text)
+
+        /* 3. *(.text*): The "Wildcard Bucket"
+         * Grabs sub-sections like .text.main or .text.Reset_Handler.
+         * - In C: Needed if you use '-ffunction-sections' (every function gets a bucket).
+         * - In Assembly: Needed because handlers are explicitly named (e.g., .text.Reset_Handler).
+         * Without this wildcard, your Startup code would be ignored by the linker.
+         */
         *(.text*)
-    } > FLASH /* Put this in the flash memory region */
+        
+
+
+    } > FLASH
 }
