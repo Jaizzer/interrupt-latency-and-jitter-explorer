@@ -72,7 +72,29 @@ SECTIONS
          * Without this wildcard, your Startup code would be ignored by the linker.
          */
         *(.text*)
-        
+
+        /* 4. glue_7 and glue_7t: THE BITE-SIZE GEARBOX 
+         * This is where the "Plus 1" is used to toggle the CPU's internal 
+         * Mode Switch, determining if it swallows 16 or 32 bits.
+         */
+
+        /* * 4a. .glue_7: ARM to Thumb (The 16-bit Swallow)
+         * EXAMPLE: The 32-bit ARM math function returns to your 16-bit main.c.
+         * 1. THE START: main.c physically begins at ORIGINAL ADDRESS 0x08000100.
+         * 2. THE TOGGLE: To return to Thumb, the Linker conducts address 0x08000101 (+1).
+         * 3. MODE SWITCH: Hardware sees Bit 0 is '1' and toggles to THUMB mode.
+         * 4. SWALLOW AMOUNT: The CPU reconfigures (glue is the toggler) to grab 16-bit (2-byte) chunks starting at ORIGINAL ADDRESS 0x08000100.
+         */
+        *(.glue_7)
+
+        /* * 4b. .glue_7t: Thumb to ARM (The 32-bit Swallow)
+         * EXAMPLE: Your 16-bit main.c calls the 32-bit ARM math function.
+         * 1. THE START: Math function physically begins at ORIGINAL ADDRESS 0x08000500.
+         * 2. THE TOGGLE: To enter ARM, the Linker conducts address 0x08000500 (Ends in 0).
+         * 3. MODE SWITCH: Hardware sees Bit 0 is '0' and toggles to ARM mode.
+         * 4. SWALLOW AMOUNT: The CPU reconfigures (glue is the toggler)  to grab 32-bit (4-byte) chunks starting at ORIGINAL ADDRESS 0x08000500.
+         */
+        *(.glue_7t)
 
 
     } > FLASH
