@@ -96,6 +96,18 @@ SECTIONS
          */
         *(.glue_7t)
 
+        /* 5. .rodata: The "Immutable" Bucket 
+         * This is for constants, like: const int MAX_SPEED = 500;
+         * Since these never change, we keep them in FLASH to save RAM.
+        */
+        . = ALIGN(4);
+        *(.rodata)
+        *(.rodata*)
 
+        . = ALIGN(4)
+        /* 
+         * THE BOOKMARK: This marks the exact byte where the "Code" ends and the "Initial Data" begins.
+        */
+        _etext = .;
     } > FLASH
 }
