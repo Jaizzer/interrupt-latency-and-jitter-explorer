@@ -118,4 +118,40 @@ SECTIONS
      * assembly 'ldr' instruction to find the data in Flash.
      */
     _sidata = LOADADDR(.data);
+    
+     /* -----------------------------
+     * .bss Section: The "Empty Room"
+     * This contains global/static variables that start at zero (e.g., int x = 0;).
+     * * THE EFFICIENCY RULE: Since we know these must be zero, we don't store 
+     * them in FLASH. This section takes up ZERO space in your binary file.
+     * The Startup Assembly loop simply "wipes" this RAM area at boot.
+     */
+    .bss :
+    {
+        . = ALIGN(4);      /* 1. Snap to 4-byte grid for fast 32-bit clearing */
+        
+        /* 2. THE HANDSHAKE: _sbss is your "Private" name. 
+         * It must exactly match the label in your startup_stm32.s loop.
+         */
+        _sbss = .;         
+
+        /* 3. THE STANDARD: __bss_start__ is the "Public" name.
+         * Many C libraries (like libc) expect this name to exist. 
+         * It points to the exact same RAM address as _sbss.
+         */
+        __bss_start__ = _sbss; 
+
+        *(.bss)            /* 4. Pull in all standard .bss sections */
+        *(.bss*)           /* 5. Pull in wildcard .bss sections (e.g., .bss.main) */
+        *(COMMON)          /* 6. Pull in 'common' symbols from older C code */
+
+        . = ALIGN(4);      /* 7. Final alignment padding */
+        
+        /* 8. THE STOP SIGNAL: _ebss tells your assembly loop when to quit.
+         * __bss_end__ provides the same "Public" alias for libraries.
+         */
+        _ebss = .;         
+        __bss_end__ = _ebss;
+
+    } > RAM                /* NO "AT > FLASH" - We generate zeros in RAM on the fly! */
 }
