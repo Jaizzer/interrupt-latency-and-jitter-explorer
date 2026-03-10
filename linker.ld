@@ -154,4 +154,16 @@ SECTIONS
         __bss_end__ = _ebss;
 
     } > RAM                /* NO "AT > FLASH" - We generate zeros in RAM on the fly! */
+
+    /* -----------------------------
+     * THE TRASH CAN: Discard metadata the ARM chip doesn't need.
+     * .note.GNU-stack: A Linux security flag (useless on bare metal).
+     * .gnu_debuglink: A link to external debug files (useless in the .bin).
+     */
+    /DISCARD/ :
+    {
+        *(.note.GNU-stack)
+        *(.gnu_debuglink)
+        *(.gnu.lto)
+    }
 }
