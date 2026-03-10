@@ -166,4 +166,34 @@ SECTIONS
         *(.gnu_debuglink)
         *(.gnu.lto)
     }
+
+
+    /* -----------------------------
+     * ._user_heap_stack: The "Building Inspector"
+     * This is a "Safety Net" that prevents your code from even being written 
+     * to the board if there isn't enough RAM for it to actually run.
+     * * THE LOGIC: It doesn't store data; it "pretends" to use extra RAM to 
+     * ensure your Stack (local variables) has room to "breathe" without 
+     * smashing into your Global variables.
+     */
+    ._user_heap_stack :
+    {
+        . = ALIGN(8);      /* 1. ARM Standard: Stack must be on an 8-byte grid */
+        
+        /* 2. THE DYNAMIC START: 'end' and '_end' tell malloc() exactly 
+         * where the "Free RAM" begins (right after your globals).
+         */
+        PROVIDE ( end = . );
+        PROVIDE ( _end = . );
+
+        /* 3. THE RESERVATION: Pushing the "dot" forward to claim space.
+         * 0x200 (512 bytes) reserved for the Heap (dynamic memory).
+         * 0x400 (1024 bytes) reserved for the Stack (function calls).
+         */
+        . = . + 0x200;     
+        . = . + 0x400;     
+
+        . = ALIGN(8);      /* 4. Final alignment for the "Ghost" boundary */
+
+    } > RAM                /* If (Globals + Heap + Stack) > 128KB, the build FAILS here. */
 }
