@@ -64,8 +64,7 @@ $(TARGET).bin: $(TARGET).elf
 
 # Custom command to flash the board.
 flash: $(TARGET).bin
-	st-flash write $(TARGET).bin 0x08000000
-	st-flash reset
+	st-flash --connect-under-reset write $(TARGET).bin 0x08000000
 
 # Shows you the memory usage in the terminal.
 size: $(TARGET).elf
