@@ -7,7 +7,7 @@ MEMORY
 }
 
 /* Define the end of RAM to use as the Initial Stack pointer since the stack grows downward */
-__estack = ORIGIN(RAM) + LENGTH(RAM);
+_estack = ORIGIN(RAM) + LENGTH(RAM);
 
 /* --- 2. Sections Mapping --- */
 SECTIONS
