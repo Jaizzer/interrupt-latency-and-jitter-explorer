@@ -1,16 +1,20 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Cortex Debug",
-            "cwd": "${workspaceFolder}",
-            "executable": "application.elf",
-            "request": "launch",
-            "type": "cortex-debug",
-            "runToEntryPoint": "main",
-            "servertype": "stlink",      
-            "device": "STM32F411RE",     
-            "interface": "swd" 
-        }
-    ]
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Cortex Debug",
+			"cwd": "${workspaceFolder}",
+			"executable": "application.elf",
+			"request": "launch",
+			"type": "cortex-debug",
+			"runToEntryPoint": "main",
+			"servertype": "stlink",
+			"device": "STM32F411RE",
+			"interface": "swd",
+			"liveWatch": {
+				"enabled": true,
+				"samplesPerSecond": 4
+			}
+		}
+	]
 }
